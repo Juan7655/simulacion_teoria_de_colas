@@ -13,15 +13,16 @@ tiempo_espera = "Tiempo en espera"
 clientes_cola = "Clientes en cola"
 
 
-clients = 5000
-servers = 2
+clients = 500
 
 
 def run():
+	global servers
 	client_generator = Server.Server(lambda x: -2 * np.log(1 - x))
 	service_time = [Server.Server(lambda x: x * (1.5 - 0.5) + 0.5),
 	                Server.Server(lambda x: x * (2.5 - 2) + 2),
 	                Server.Server(lambda x: x * (2.5 - 2) + 2)]
+	servers = len(service_time) - 1
 	mat = pandas.DataFrame({tiempo_llegadas: client_generator.get_list(clients),
 	                        duracion_servicio + " 1": service_time[0].get_list(clients)})
 	for i in range(servers):
@@ -106,19 +107,15 @@ def matriz_inicial(mat):
 	for i in range(servers):
 		mat.insert(1, clientes_cola + " 2." + str(i + 1), clientes_cola_list_2[i])
 
-	return mat[['Tiempo entre llegadas', 'Momento de llegada', 'Inicia servicio 1',
+	column_arr = ['Tiempo entre llegadas', 'Momento de llegada', 'Inicia servicio 1',
 	            'Duracion servicio 1', 'Termina servicio 1', 'Tiempo en el sistema',
-	            'Tiempo en espera', 'Clientes en cola 1', 'Inicia servicio 2.1',
-	            'Duracion servicio 2.1', 'Termina servicio 2.1', 'Clientes en cola 2.1',
-	             'Inicia servicio 2.2',
-	             'Duracion servicio 2.2', 'Termina servicio 2.2', 'Clientes en cola 2.2',
-	            # 'Inicia servicio 2.3',
-	            # 'Duracion servicio 2.3', 'Termina servicio 2.3', 'Clientes en cola 2.3',
-	            # 'Inicia servicio 2.4',
-	            # 'Duracion servicio 2.4', 'Termina servicio 2.4', 'Clientes en cola 2.4',
-	            # 'Inicia servicio 2.5',
-	            # 'Duracion servicio 2.5', 'Termina servicio 2.5', 'Clientes en cola 2.5'
-	            ]]
+	            'Tiempo en espera', 'Clientes en cola 1']
+	for i in range(servers):
+		column_arr.append('Inicia servicio 2.' + str(i + 1))
+		column_arr.append('Duracion servicio 2.' + str(i + 1))
+		column_arr.append('Termina servicio 2.' + str(i + 1))
+		column_arr.append('Clientes en cola 2.' + str(i + 1))
+	return mat[column_arr]
 
 
 if __name__ == '__main__':
