@@ -73,10 +73,10 @@ def matriz_inicial(mat):
 					val = termina_servicio_list_2[j][i-1]
 					serv = j
 			for j in range(servers):
-				if j == serv:
+				if j == serv:  # es el servidor óptimo, el que atenderá al cliente actual
 					inicia_servicio_list_2[j].append(max(termina_servicio_list[i], termina_servicio_list_2[j][i - 1]))
 					termina_servicio_list_2[j].append(inicia_servicio_list_2[j][i] + mat[duracion_servicio + " 2." + str(j + 1)][i])
-				else:
+				else:  # los servidores que no atenderán al cliente actual, conservan sus valores.
 					inicia_servicio_list_2[j].append(inicia_servicio_list_2[j][i - 1])
 					termina_servicio_list_2[j].append(termina_servicio_list_2[j][i - 1])
 		first = False
