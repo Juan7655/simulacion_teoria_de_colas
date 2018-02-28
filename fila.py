@@ -13,18 +13,15 @@ tiempo_espera = "Tiempo en espera"
 clientes_cola = "Clientes en cola"
 
 
-clients = 500
-servers = 5
+clients = 5000
+servers = 2
 
 
 def run():
 	client_generator = Server.Server(lambda x: -2 * np.log(1 - x))
 	service_time = [Server.Server(lambda x: x * (1.5 - 0.5) + 0.5),
 	                Server.Server(lambda x: x * (2.5 - 2) + 2),
-	                Server.Server(lambda x: x * (2.5 - 2) + 2),
-	                Server.Server(lambda x: x * (2.5 - 2) + 2),
-	                Server.Server(lambda x: x * (1.5 - 0.5) + 0.5),
-	                Server.Server(lambda x: x*5)]
+	                Server.Server(lambda x: x * (2.5 - 2) + 2)]
 	mat = pandas.DataFrame({tiempo_llegadas: client_generator.get_list(clients),
 	                        duracion_servicio + " 1": service_time[0].get_list(clients)})
 	for i in range(servers):
@@ -35,6 +32,8 @@ def run():
 	for i in range(servers):
 		plt.step(x_val, mat[clientes_cola + " 2." + str(i + 1)], where='post', label=" Servidor 2." + str(i + 1))
 	plt.legend()
+	plt.xlabel("Cliente")
+	plt.ylabel(clientes_cola)
 	plt.show()
 
 
@@ -49,6 +48,7 @@ def matriz_inicial(mat):
 	clientes_cola_list_2 = []
 	first = True
 
+	# inicia los vectores de vectores
 	for _ in range(servers):
 		inicia_servicio_list_2.append([])
 		termina_servicio_list_2.append([])
@@ -59,14 +59,27 @@ def matriz_inicial(mat):
 		inicia_servicio_list.append(max(momento_llegada_list[i], 0 if first else termina_servicio_list[i - 1]))
 		termina_servicio_list.append(inicia_servicio_list[i] + mat[duracion_servicio + " 1"][i])
 
-		for j in range(servers):
-			if j == 0:
-				inicia_servicio_list_2[j].append(0 if first else max(termina_servicio_list[i], termina_servicio_list_2[j][i - 1]))
-				termina_servicio_list_2[j].append(inicia_servicio_list_2[j][i] + mat[duracion_servicio + " 2." + str(j + 1)][i])
-			else:
-				inicia_servicio_list_2[j].append(0 if first else max(termina_servicio_list_2[j - 1][i], termina_servicio_list_2[j][i - 1]))
-				termina_servicio_list_2[j].append(inicia_servicio_list_2[j][i] + mat[duracion_servicio + " 2." + str(j + 1)][i])
+		if first:
+			for j in range(servers):
+				inicia_servicio_list_2[j].append(termina_servicio_list[0] if j == 0 else 0)
+				termina_servicio_list_2[j].append(inicia_servicio_list_2[j][0] +
+				                                  mat[duracion_servicio + " 2." + str(j + 1)][0] if j == 0 else 0)
+		else:
+			serv = 0
+			val = termina_servicio_list_2[serv][i-1]
+			for j in range(1, servers):
+				if termina_servicio_list_2[j][i-1] < val:
+					val = termina_servicio_list_2[j][i-1]
+					serv = j
+			for j in range(servers):
+				if j == serv:
+					inicia_servicio_list_2[j].append(max(termina_servicio_list[i], termina_servicio_list_2[j][i - 1]))
+					termina_servicio_list_2[j].append(inicia_servicio_list_2[j][i] + mat[duracion_servicio + " 2." + str(j + 1)][i])
+				else:
+					inicia_servicio_list_2[j].append(inicia_servicio_list_2[j][i - 1])
+					termina_servicio_list_2[j].append(termina_servicio_list_2[j][i - 1])
 		first = False
+
 	for j in range(servers):
 		mat.insert(1, inicia_servicio + " 2." + str(j + 1), inicia_servicio_list_2[j])
 		mat.insert(1, termina_servicio + " 2." + str(j + 1), termina_servicio_list_2[j])
@@ -97,14 +110,14 @@ def matriz_inicial(mat):
 	            'Duracion servicio 1', 'Termina servicio 1', 'Tiempo en el sistema',
 	            'Tiempo en espera', 'Clientes en cola 1', 'Inicia servicio 2.1',
 	            'Duracion servicio 2.1', 'Termina servicio 2.1', 'Clientes en cola 2.1',
-	            'Inicia servicio 2.2',
-	            'Duracion servicio 2.2', 'Termina servicio 2.2', 'Clientes en cola 2.2',
-	            'Inicia servicio 2.3',
-	            'Duracion servicio 2.3', 'Termina servicio 2.3', 'Clientes en cola 2.3',
-	            'Inicia servicio 2.4',
-	            'Duracion servicio 2.4', 'Termina servicio 2.4', 'Clientes en cola 2.4',
-	            'Inicia servicio 2.5',
-	            'Duracion servicio 2.5', 'Termina servicio 2.5', 'Clientes en cola 2.5'
+	             'Inicia servicio 2.2',
+	             'Duracion servicio 2.2', 'Termina servicio 2.2', 'Clientes en cola 2.2',
+	            # 'Inicia servicio 2.3',
+	            # 'Duracion servicio 2.3', 'Termina servicio 2.3', 'Clientes en cola 2.3',
+	            # 'Inicia servicio 2.4',
+	            # 'Duracion servicio 2.4', 'Termina servicio 2.4', 'Clientes en cola 2.4',
+	            # 'Inicia servicio 2.5',
+	            # 'Duracion servicio 2.5', 'Termina servicio 2.5', 'Clientes en cola 2.5'
 	            ]]
 
 
