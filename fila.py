@@ -23,9 +23,16 @@ class Manager:
                 self.servers.append(Cluster.Cluster(index,  inputs,  fun,  num_procesos, acceptance, self))
         print(len(self.servers))
         
-        for i in range(10, len(self.servers)):
-            print(self.servers[i].get_result())
-#        print(self.servers[16].get_result())
+#        for i in range(10, len(self.servers)):
+#            print(self.servers[i].get_result())
+        wq,  ws = [], []
+        for i in range(40):
+            wq_val,  ws_val = self.servers[11].get_result(i)
+            wq.append(wq_val)
+            ws.append(ws_val)
+        lista = np.array([wq,  ws]).T[0]
+        esperas = pd.DataFrame(lista,  columns=['wq','ws'])
+        esperas.to_csv('files/esperas_finales.csv')
     
     def get_server(self,  id):
         return self.servers[id]

@@ -19,6 +19,7 @@ class Cluster(Servidor):
         duracion = [[0 for _ in range(len(data))] for i in range(self.n)]
         termina_cluster = []
         termina_cluster_neto = []
+        wq,  ws = 0,  0
         i = 0
         while i  < len(data):
             best_server = 0 if i == 0 else get_best_server([termina[j][i - 1] for j in range(self.n)])
@@ -27,6 +28,8 @@ class Cluster(Servidor):
                     inicio[j][i] = init = max(data['hora_llegada'][i],  0 if i == 0 else termina[j][i - 1])
                     duracion[j][i] = dur = (self.fun(np.random.rand()) if data['reproceso'][i] == 0 else self.fun2(np.random.rand()))
                     hora_fin = init + dur
+                    ws += hora_fin - data['hora_llegada'][i]
+                    wq += init - data['hora_llegada'][i]
                     termina[j][i] = hora_fin
                     termina_cluster_neto.append(hora_fin) 
                     if np.random.rand() <= self.acceptance:
@@ -50,7 +53,9 @@ class Cluster(Servidor):
             slice = pd.DataFrame(data['termina_servicio'][:i],  columns=[0])
             cola.append(sum([j > data['hora_llegada'][i] for j in slice[0]]))
         data.insert(data.shape[1],  "fila",  cola)
+        
         self.data = data
+        self.tiempos = [wq,  ws]
         print("output for cluster {0}".format(self.index))
         return np.sort([int(i) for i in termina_cluster])
 

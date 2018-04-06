@@ -32,16 +32,16 @@ class Servidor:
         print("output for server {0}".format(self.index))
         return data['termina_servicio'].astype('float64')
         
-    def get_result(self):
+    def get_result(self,  n):
         self.get_output()
         for i in self.data.columns:
             self.data[i] = self.data[i].astype('float64')
-        self.data.to_csv('files/final_output.csv')
-        plt.step(self.data['hora_llegada'],  self.data['fila'])
-        plt.xlabel("Servidor " + str(self.index))
-        plt.ylabel("Clientes en cola")
-        plt.show()
-        return "Done."
+        self.data.to_csv('files/final_output{0}.csv'.format(n))
+#        plt.step(self.data['hora_llegada'],  self.data['fila'])
+#        plt.xlabel("Servidor " + str(self.index))
+#        plt.ylabel("Clientes en cola")
+#        plt.show()
+        return self.tiempos[0],  self.tiempos[1]
     
     def get_input_val(self):
         if self.inputs is None:
