@@ -3,10 +3,10 @@ import pandas as pd
 import numpy as np
 
 class Cluster(Servidor):
-    def __init__(self,  index, inputs, fun,  n, acceptance,   manager):
+    def __init__(self,  index, inputs, fun,  n, acceptance,  fun_rechazo,   manager):
         Servidor.__init__(self,  index, inputs, fun, manager)
         self.acceptance = acceptance
-        self.fun2 = lambda x: x * (4.0 - 2.0) + 2.0
+        self.fun2 = fun_rechazo
         self.n = n
     
     def get_output(self):
@@ -56,15 +56,13 @@ class Cluster(Servidor):
         
         self.data = data
         self.tiempos = [wq,  ws]
-        print("output for cluster {0}".format(self.index))
         return np.sort([int(i) for i in termina_cluster])
 
 class Assembly(Cluster):
-    def __init__(self,  index, inputs, fun,  n, acceptance,   manager):
-        valid = {12,  15}
-        if index not in valid:
+    def __init__(self,  index, inputs, fun,  n, acceptance,  fun_rechazo,   manager):
+        if index not in {12,  15}:
             raise ValueError("AssemblyConstructor: Cluster must be one of %r." % valid)
-        Cluster.__init__(self,  index, inputs, fun,  n, acceptance,   manager)
+        Cluster.__init__(self,  index, inputs, fun,  n, acceptance,  fun_rechazo,   manager)
 
     def get_input_val(self):
         input_val = []
@@ -75,13 +73,13 @@ class Assembly(Cluster):
             val = [[], [], [], []]
             for i in self.inputs:
                 input_val.append(list(self.manager.get_server(i).get_output().tolist()))
-            val[0] = input_val[0]
-            val[3] = input_val[2]
-            val[1] = input_val[1][::2]
-            val[2] = input_val[1][1::2]
-            return np.max(val,  axis=0)
+            val[0] = input_val[0] # pieza A
+            val[3] = input_val[2] # pieza C
+            val[1] = input_val[1][::2] # primera pieza B
+            val[2] = input_val[1][1::2] # segunda pieza B
+            return np.max(val,  axis=0) # returns list with maximum time values for each ensemble
         
-            
+# receives a list of values and returns the id of the server with minimum value
 def get_best_server(server_last):
     index = 0
     val = server_last[0]

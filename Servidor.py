@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+#import seaborn as sb
 
 class Servidor:
     def __init__(self,  index, inputs, fun,  manager):
@@ -32,21 +33,25 @@ class Servidor:
         print("output for server {0}".format(self.index))
         return data['termina_servicio'].astype('float64')
         
-    def get_result(self,  n):
+    def get_result(self,  n=0,  show_graph=False):
         self.get_output()
         for i in self.data.columns:
             self.data[i] = self.data[i].astype('float64')
         self.data.to_csv('files/final_output{0}.csv'.format(n))
-#        plt.step(self.data['hora_llegada'],  self.data['fila'])
-#        plt.xlabel("Servidor " + str(self.index))
-#        plt.ylabel("Clientes en cola")
-#        plt.show()
-        return self.tiempos[0],  self.tiempos[1]
+        if show_graph:
+#            sb.pairplot(data)
+#            plt.show()
+            plt.step(self.data['hora_llegada'],  self.data['fila'])
+            plt.xlabel("Servidor " + str(self.index))
+            plt.ylabel("Clientes en cola")
+            plt.show()
+        return float(self.tiempos[0]),  float(self.tiempos[1])
     
+    # returns a list with input elements of the server, orderder by arrival time
     def get_input_val(self):
         if self.inputs is None:
-            return None
+            return None # there are no inputs
         input_val = []
-        for i in self.inputs:
+        for i in self.inputs: # append the output of each connected server
             input_val += list(self.manager.get_server(i).get_output().tolist())
         return np.sort(input_val)
