@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-#import seaborn as sb
+import seaborn as sb
+
 
 class Servidor:
     def __init__(self,  index, inputs, fun,  manager):
@@ -39,8 +40,9 @@ class Servidor:
             self.data[i] = self.data[i].astype('float64')
         self.data.to_csv('files/final_output{0}.csv'.format(n))
         if show_graph:
-#            sb.pairplot(data)
-#            plt.show()
+            sb.pairplot(self.data)
+            plt.show()
+            self.data = self.data.sort_values(by=['hora_llegada'])
             plt.step(self.data['hora_llegada'],  self.data['fila'])
             plt.xlabel("Servidor " + str(self.index))
             plt.ylabel("Clientes en cola")
@@ -50,8 +52,8 @@ class Servidor:
     # returns a list with input elements of the server, orderder by arrival time
     def get_input_val(self):
         if self.inputs is None:
-            return None # there are no inputs
+            return None  # there are no inputs
         input_val = []
-        for i in self.inputs: # append the output of each connected server
+        for i in self.inputs:  # append the output of each connected server
             input_val += list(self.manager.get_server(i).get_output().tolist())
         return np.sort(input_val)

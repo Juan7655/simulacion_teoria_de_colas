@@ -1,18 +1,18 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 
-import Servidor
 import Cluster
 
 
 class Manager:
     system_set = False
+
     def run(self, server,  n,  ciclos=1,  show_graph=False):
         if not self.system_set:
             self.setup()
-        self.input_size = n # set number of raw input material
+        self.input_size = n  # set number of raw input material
         wq,  ws = [], []
-        for i in range(ciclos): # number of runs for the specified server
+        for i in range(ciclos):  # number of runs for the specified server
             wq_val,  ws_val = self.servers[server].get_result(i,  show_graph)
             wq.append(wq_val)
             ws.append(ws_val)
@@ -30,11 +30,11 @@ class Manager:
             num_procesos = server['procesos']
             acceptance = 1.0 - server['rechazo']
             fun_rechazo = eval("lambda x: " + server['funcion_rechazo'])
-            inputs = None if type(inputs) == float else map(int,  inputs) # convert inputs to int list
+            inputs = None if type(inputs) == float else list(map(int,  inputs))  # convert inputs to int list
             if index in {12,  15}: # assembly clusters
-                self.servers.append(Cluster.Assembly(index,  inputs,  fun,  num_procesos, acceptance,  fun_rechazo, self))
-            else: # other normal clusters
-                self.servers.append(Cluster.Cluster(index,  inputs,  fun,  num_procesos, acceptance,  fun_rechazo, self))
+                self.servers.append(Cluster.Assembly(index, inputs, fun, num_procesos, acceptance, fun_rechazo, self))
+            else:  # other normal clusters
+                self.servers.append(Cluster.Cluster(index, inputs, fun, num_procesos, acceptance, fun_rechazo, self))
         self.system_set = True
     
     def get_server(self,  id):
