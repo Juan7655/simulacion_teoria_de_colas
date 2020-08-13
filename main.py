@@ -1,7 +1,7 @@
 import time
 import matplotlib.pyplot as plt
 
-import Manager
+from src import manager
 
 
 def waiting_times(server, n, ciclos=1):
@@ -36,7 +36,7 @@ def show_graphs(list_servers=None):
 
 
 if __name__ == '__main__':
-    man = Manager.Manager()
+    man = manager.Manager()
     # man.run(13, 100, show_graph=True)
     ## para mostrar las graficas del comportamiento de la cola
     # show_graphs([3, 6, 9])  # muestra las graficas de los servidores que se pongan en la lista

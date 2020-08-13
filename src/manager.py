@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-import Cluster
+from src import cluster
 
 
 class Manager:
@@ -21,7 +21,7 @@ class Manager:
         esperas.to_csv('files/esperas_finales.csv')
     
     def setup(self):
-        m_x = pd.read_csv("files/input.csv")  # read input configurations
+        m_x = pd.read_csv("../files/input.csv")  # read input configurations
         self.servers = []
         for index,  server in m_x.iterrows(): # iterate over servers in configuration matrix
             inputs = server['inputs']
@@ -32,9 +32,9 @@ class Manager:
             fun_rechazo = eval("lambda x: " + server['funcion_rechazo'])
             inputs = None if type(inputs) == float else list(map(int,  inputs))  # convert inputs to int list
             if index in {12,  15}: # assembly clusters
-                self.servers.append(Cluster.Assembly(index, inputs, fun, num_procesos, acceptance, fun_rechazo, self))
+                self.servers.append(cluster.Assembly(index, inputs, fun, num_procesos, acceptance, fun_rechazo, self))
             else:  # other normal clusters
-                self.servers.append(Cluster.Cluster(index, inputs, fun, num_procesos, acceptance, fun_rechazo, self))
+                self.servers.append(cluster.Cluster(index, inputs, fun, num_procesos, acceptance, fun_rechazo, self))
         self.system_set = True
     
     def get_server(self,  id):
